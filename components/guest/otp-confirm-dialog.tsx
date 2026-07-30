@@ -39,15 +39,6 @@ export function OtpConfirmDialog({
   const busy = confirming || submitting;
 
   useEffect(() => {
-    if (!open) {
-      setOtp("");
-      setError("");
-      setSubmitting(false);
-      submittedFor.current = null;
-    }
-  }, [open]);
-
-  useEffect(() => {
     if (!open || busy || otp.length !== 6) return;
     if (submittedFor.current === otp) return;
     submittedFor.current = otp;
@@ -79,6 +70,7 @@ export function OtpConfirmDialog({
         if (!next) {
           setOtp("");
           setError("");
+          setSubmitting(false);
           submittedFor.current = null;
         }
         onOpenChange(next);

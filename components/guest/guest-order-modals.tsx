@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Minus,
   Plus,
@@ -250,11 +250,26 @@ export function GuestSingleOrderModal({
   item,
   onApprove,
 }: SingleModalProps) {
-  const [qty, setQty] = useState(1);
+  // Remount when dialog opens / item changes so qty resets without an effect.
+  const instanceKey = open && item ? `${item.id}` : "closed";
+  return (
+    <GuestSingleOrderModalBody
+      key={instanceKey}
+      open={open}
+      onOpenChange={onOpenChange}
+      item={item}
+      onApprove={onApprove}
+    />
+  );
+}
 
-  useEffect(() => {
-    if (open) setQty(1);
-  }, [open, item?.id]);
+function GuestSingleOrderModalBody({
+  open,
+  onOpenChange,
+  item,
+  onApprove,
+}: SingleModalProps) {
+  const [qty, setQty] = useState(1);
 
   if (!item) return null;
   const total = item.price * qty;

@@ -33,12 +33,9 @@ function LoginForm() {
       router.replace("/home");
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-hydration auth gate
     setChecking(false);
   }, [router]);
-
-  useEffect(() => {
-    if (otpFromQr) setOtp(otpFromQr);
-  }, [otpFromQr]);
 
   useEffect(() => {
     if (checking || submitting || otp.length !== 6) return;

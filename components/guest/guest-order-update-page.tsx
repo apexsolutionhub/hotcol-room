@@ -154,16 +154,6 @@ export function GuestOrderUpdatePage({ mode }: { mode: Mode }) {
   const meta = modeMeta(mode);
   const Icon = meta.icon;
 
-  function selectLine(lineId: number) {
-    setSelectedId(lineId);
-    setSideTab("edit");
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
-      requestAnimationFrame(() => {
-        panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  }
-
   async function reload() {
     const data = await fetchGuestBill();
     setBill(data);
@@ -193,6 +183,8 @@ export function GuestOrderUpdatePage({ mode }: { mode: Mode }) {
     return () => {
       cancelled = true;
     };
+    // reload is stable for this mode mount; including it retriggers on every parent render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   useEffect(() => {
@@ -278,13 +270,9 @@ export function GuestOrderUpdatePage({ mode }: { mode: Mode }) {
   );
 
   const selectedLine =
-    serviceLines.find((line) => line.id === selectedId) ?? serviceLines[0] ?? null;
-
-  useEffect(() => {
-    if (!selectedLine && serviceLines.length > 0) {
-      setSelectedId(serviceLines[0].id);
-    }
-  }, [selectedLine, serviceLines]);
+    serviceLines.find((line) => line.id === selectedId) ??
+    serviceLines[0] ??
+    null;
 
   function requestUpdate(line: GuestBillLine) {
     const quantity = draftQty[line.id] ?? (Number(line.quantity) || 1);
@@ -452,7 +440,21 @@ export function GuestOrderUpdatePage({ mode }: { mode: Mode }) {
                           >
                             <button
                               type="button"
-                              onClick={() => selectLine(line.id)}
+                              onClick={() => {
+                                setSelectedId(line.id);
+                                setSideTab("edit");
+                                if (
+                                  typeof window !== "undefined" &&
+                                  window.matchMedia("(max-width: 767px)").matches
+                                ) {
+                                  requestAnimationFrame(() => {
+                                    panelRef.current?.scrollIntoView({
+                                      behavior: "smooth",
+                                      block: "start",
+                                    });
+                                  });
+                                }
+                              }}
                               className={cn(
                                 "flex min-w-0 flex-1 gap-3 p-3 text-left",
                                 isSelected && "border-l-4 border-l-primary pl-2.5",

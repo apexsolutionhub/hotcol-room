@@ -117,9 +117,12 @@ export default function BillPage() {
       map.set(key, list);
     }
 
-    return KIND_ORDER.filter((k) => map.has(k))
-      .concat([...map.keys()].filter((k) => !KIND_ORDER.includes(k as (typeof KIND_ORDER)[number])))
-      .map((kind) => {
+    return [
+      ...KIND_ORDER.filter((k) => map.has(k)),
+      ...[...map.keys()].filter(
+        (k) => !KIND_ORDER.includes(k as (typeof KIND_ORDER)[number]),
+      ),
+    ].map((kind) => {
         const lines = map.get(kind) || [];
         const subtotal = lines.reduce((s, l) => s + (Number(l.amountETB) || 0), 0);
         return { kind, lines, subtotal };
