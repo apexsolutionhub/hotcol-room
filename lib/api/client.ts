@@ -1,7 +1,7 @@
 import axios from "axios";
 
 function normalizeGraphqlHttpUrl(raw: string | undefined): string {
-  const fallback = "http://localhost:4000/graphql";
+  const fallback = "https://hotcol-room-backend.vercel.app/graphql";
   const s = (raw ?? fallback).trim() || fallback;
   const base = s.replace(/\/+$/, "");
   if (/\/graphql$/i.test(base)) return base;
