@@ -1,7 +1,10 @@
 import axios from "axios";
 
+export const ROOM_VERCEL_GRAPHQL_URL =
+  "https://hotcol-room-backend.vercel.app/graphql";
+
 function normalizeGraphqlHttpUrl(raw: string | undefined): string {
-  const fallback = "https://hotcol-room-backend.vercel.app/graphql";
+  const fallback = ROOM_VERCEL_GRAPHQL_URL;
   const s = (raw ?? fallback).trim() || fallback;
   const base = s.replace(/\/+$/, "");
   if (/\/graphql$/i.test(base)) return base;
@@ -38,6 +41,11 @@ export async function graphqlRequest<T>(
 
   if (res.data.errors?.length) {
     const msg = res.data.errors.map((e) => e.message).filter(Boolean).join(" · ");
+    if (/pool timeout|failed to retrieve a connection/i.test(msg)) {
+      throw new Error(
+        "Room API could not open a database connection. Redeploy hotcol-room-backend and try again.",
+      );
+    }
     throw new Error(msg || "Request failed");
   }
   if (!res.data.data) throw new Error("Empty response from server");
@@ -50,7 +58,7 @@ export function notifyError(error: unknown, fallback = "Something went wrong") {
       return "Request timed out. Check your connection and try again.";
     }
     if (!error.response && error.message === "Network Error") {
-      return "Could not reach the room API. Is the backend running?";
+      return `Could not reach the room API at ${API_URL}. Confirm hotcol-room-backend is deployed on Vercel.`;
     }
   }
   if (error instanceof Error && error.message) return error.message;
