@@ -18,7 +18,11 @@ function toStored(stay: GuestStay): StoredGuestStay {
     voucherCode: stay.voucherCode,
     status: stay.status,
     HotelName: stay.HotelName,
-    guest: stay.guest,
+    guest: {
+      firstName: stay.guest.firstName,
+      lastName: stay.guest.lastName,
+      phone: stay.guest.phone,
+    },
     rooms: stay.rooms,
     property: stay.property,
   };

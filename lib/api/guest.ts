@@ -9,6 +9,21 @@ export type GuestProperty = {
   hotelPhoneSecondary?: string | null;
 };
 
+export type GuestProfile = {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  phoneSecondary: string;
+  email: string;
+  sex: string;
+  isEthiopian: boolean;
+  nationalId: string;
+  passportNumber: string;
+  country: string;
+  stateRegion: string;
+  addressLine: string;
+};
+
 export type GuestStay = {
   id: number;
   voucherCode: string;
@@ -16,8 +31,12 @@ export type GuestStay = {
   HotelName: string;
   arrivalAt: string;
   departureAt: string;
+  expectedNights: number;
+  expectedDepartureAt?: string | null;
   nights: number;
-  guest: { firstName: string; lastName: string; phone: string };
+  adults: number;
+  children: number;
+  guest: GuestProfile;
   rooms: Array<{ id: number; roomNumber: string; roomType: string }>;
   bill: GuestBill | null;
   property: GuestProperty | null;
@@ -63,6 +82,30 @@ export type LaundryCatalogItem = {
   kind: string;
 };
 
+export type GuestComplaint = {
+  id: number;
+  category: string;
+  message: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type GuestRating = {
+  id: number;
+  overall: number;
+  cleanliness?: number | null;
+  service?: number | null;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+const GUEST_PROFILE_FIELDS = `
+  firstName lastName phone phoneSecondary email sex
+  isEthiopian nationalId passportNumber country stateRegion addressLine
+`;
+
 const STAY_FIELDS = `
   id
   voucherCode
@@ -70,8 +113,12 @@ const STAY_FIELDS = `
   HotelName
   arrivalAt
   departureAt
+  expectedNights
+  expectedDepartureAt
   nights
-  guest { firstName lastName phone }
+  adults
+  children
+  guest { ${GUEST_PROFILE_FIELDS} }
   rooms { id roomNumber roomType }
   bill {
     id
@@ -92,6 +139,14 @@ const STAY_FIELDS = `
     }
   }
   property { tinNumber displayName logoUrl hotelPhone hotelPhoneSecondary }
+`;
+
+const COMPLAINT_FIELDS = `
+  id category message status createdAt updatedAt
+`;
+
+const RATING_FIELDS = `
+  id overall cleanliness service comment createdAt updatedAt
 `;
 
 function authToken() {
@@ -120,6 +175,17 @@ export async function fetchGuestMe() {
     authToken(),
   );
   return data.guestMe;
+}
+
+export async function fetchGuestRegistrationCard() {
+  const data = await graphqlRequest<{ guestRegistrationCard: GuestStay }>(
+    `query GuestRegistrationCard {
+      guestRegistrationCard { ${STAY_FIELDS} }
+    }`,
+    undefined,
+    authToken(),
+  );
+  return data.guestRegistrationCard;
 }
 
 export async function fetchGuestCafeMenu() {
@@ -253,4 +319,70 @@ export async function guestPlaceOrder(input: {
     authToken(),
   );
   return data.guestPlaceOrder;
+}
+
+export async function fetchGuestMyComplaints() {
+  const data = await graphqlRequest<{ guestMyComplaints: GuestComplaint[] }>(
+    `query GuestMyComplaints {
+      guestMyComplaints { ${COMPLAINT_FIELDS} }
+    }`,
+    undefined,
+    authToken(),
+  );
+  return data.guestMyComplaints;
+}
+
+export async function guestSubmitComplaint(input: {
+  category: string;
+  message: string;
+}) {
+  const data = await graphqlRequest<{ guestSubmitComplaint: GuestComplaint }>(
+    `mutation GuestSubmitComplaint($category: String!, $message: String!) {
+      guestSubmitComplaint(category: $category, message: $message) {
+        ${COMPLAINT_FIELDS}
+      }
+    }`,
+    input,
+    authToken(),
+  );
+  return data.guestSubmitComplaint;
+}
+
+export async function fetchGuestMyRating() {
+  const data = await graphqlRequest<{ guestMyRating: GuestRating | null }>(
+    `query GuestMyRating {
+      guestMyRating { ${RATING_FIELDS} }
+    }`,
+    undefined,
+    authToken(),
+  );
+  return data.guestMyRating;
+}
+
+export async function guestSubmitRating(input: {
+  overall: number;
+  cleanliness?: number | null;
+  service?: number | null;
+  comment?: string;
+}) {
+  const data = await graphqlRequest<{ guestSubmitRating: GuestRating }>(
+    `mutation GuestSubmitRating(
+      $overall: Int!
+      $cleanliness: Int
+      $service: Int
+      $comment: String
+    ) {
+      guestSubmitRating(
+        overall: $overall
+        cleanliness: $cleanliness
+        service: $service
+        comment: $comment
+      ) {
+        ${RATING_FIELDS}
+      }
+    }`,
+    input,
+    authToken(),
+  );
+  return data.guestSubmitRating;
 }

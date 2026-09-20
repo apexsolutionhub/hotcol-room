@@ -11,6 +11,9 @@ import {
   Home,
   Phone,
   Menu,
+  MessageSquareWarning,
+  Star,
+  IdCard,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -42,6 +45,9 @@ import { RefreshIconButton } from "@/components/ui/refresh-icon-button";
 const NAV = [
   { href: "/home", label: "Home", icon: Home },
   { href: "/bill", label: "My bill", icon: Receipt },
+  { href: "/complaints", label: "Complaints", icon: MessageSquareWarning },
+  { href: "/rate", label: "Rate stay", icon: Star },
+  { href: "/registration", label: "Registration card", icon: IdCard },
 ] as const;
 
 const SERVICE_NAV = [
@@ -192,9 +198,9 @@ export function GuestShell({
   }
 
   return (
-    <div className="flex min-h-dvh w-full bg-muted/40 text-foreground">
-      <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-1 overflow-hidden border-0 bg-linear-to-br from-background via-background to-muted/20 lg:my-2 lg:max-h-[calc(100dvh-1rem)] lg:min-h-[calc(100dvh-1rem)] lg:rounded-xl lg:border lg:border-border/80 lg:bg-background lg:shadow-lg lg:ring-1 lg:ring-black/5 dark:lg:ring-white/10">
-        <aside className="hidden w-56 shrink-0 flex-col border-r border-border/80 bg-sidebar/40 lg:flex">
+    <div className="flex min-h-dvh w-full bg-muted/40 text-foreground print:bg-white">
+      <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-1 overflow-hidden border-0 bg-linear-to-br from-background via-background to-muted/20 lg:my-2 lg:max-h-[calc(100dvh-1rem)] lg:min-h-[calc(100dvh-1rem)] lg:rounded-xl lg:border lg:border-border/80 lg:bg-background lg:shadow-lg lg:ring-1 lg:ring-black/5 dark:lg:ring-white/10 print:max-w-none print:overflow-visible print:rounded-none print:border-0 print:bg-white print:shadow-none print:ring-0">
+        <aside className="hidden w-56 shrink-0 flex-col border-r border-border/80 bg-sidebar/40 print:hidden lg:flex">
           <div className="flex items-center gap-2.5 border-b border-border/70 px-4 py-4">
             <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground shadow-sm ring-1 ring-sidebar-primary/20">
               <span className="text-xs font-bold tracking-tight">HC</span>
@@ -213,8 +219,8 @@ export function GuestShell({
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-2 border-b border-border/80 bg-background/95 px-2.5 backdrop-blur supports-backdrop-filter:bg-background/80 sm:gap-3 sm:px-3 md:h-16 md:px-5">
+        <div className="flex min-w-0 flex-1 flex-col print:block">
+          <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-2 border-b border-border/80 bg-background/95 px-2.5 backdrop-blur supports-backdrop-filter:bg-background/80 print:hidden sm:gap-3 sm:px-3 md:h-16 md:px-5">
             <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
               <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
                 <SheetTrigger asChild>
@@ -289,14 +295,14 @@ export function GuestShell({
             </div>
           </header>
 
-          <main className="guest-animate-in flex-1 overflow-y-auto px-3 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-4 sm:py-5 md:px-6 md:py-6">
+          <main className="guest-animate-in flex-1 overflow-y-auto px-3 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] print:overflow-visible print:p-0 sm:px-4 sm:py-5 md:px-6 md:py-6">
             {children}
           </main>
         </div>
       </div>
 
       <Dialog open={pickOpen} onOpenChange={setPickOpen}>
-        <DialogContent className="overflow-hidden border-primary/20 bg-card/95 sm:max-w-sm shadow-xl ring-1 ring-black/5 dark:ring-white/10">
+        <DialogContent className="overflow-hidden border-primary/20 bg-card/95 print:hidden sm:max-w-sm shadow-xl ring-1 ring-black/5 dark:ring-white/10">
           <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-primary/60 via-sky-500/45 to-emerald-500/40" />
           <DialogHeader>
             <DialogTitle>Call hotel</DialogTitle>

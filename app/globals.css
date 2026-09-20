@@ -156,3 +156,18 @@ html.dark {
     animation: none;
   }
 }
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .guest-animate-in {
+    animation: none !important;
+  }
+
+  .guest-print-doc {
+    box-shadow: none !important;
+    max-width: none !important;
+  }
+}
