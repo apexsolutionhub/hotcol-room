@@ -87,6 +87,8 @@ export type GuestComplaint = {
   category: string;
   message: string;
   status: string;
+  roomNumber?: string;
+  stayId?: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -97,6 +99,8 @@ export type GuestRating = {
   cleanliness?: number | null;
   service?: number | null;
   comment: string;
+  stayId?: number;
+  voucherCode?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -142,11 +146,11 @@ const STAY_FIELDS = `
 `;
 
 const COMPLAINT_FIELDS = `
-  id category message status createdAt updatedAt
+  id category message status roomNumber stayId createdAt updatedAt
 `;
 
 const RATING_FIELDS = `
-  id overall cleanliness service comment createdAt updatedAt
+  id overall cleanliness service comment stayId voucherCode createdAt updatedAt
 `;
 
 function authToken() {
@@ -357,6 +361,17 @@ export async function fetchGuestMyRating() {
     authToken(),
   );
   return data.guestMyRating;
+}
+
+export async function fetchGuestMyRatings() {
+  const data = await graphqlRequest<{ guestMyRatings: GuestRating[] }>(
+    `query GuestMyRatings {
+      guestMyRatings { ${RATING_FIELDS} }
+    }`,
+    undefined,
+    authToken(),
+  );
+  return data.guestMyRatings;
 }
 
 export async function guestSubmitRating(input: {

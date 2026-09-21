@@ -125,7 +125,7 @@ export default function ComplaintsPage() {
     <div className="space-y-5">
       <PageHero
         title="Complaints"
-        description="Tell reception about something that needs attention during your stay."
+        description="Tell reception about something that needs attention. History includes past stays for this guest."
         icon={<MessageSquareWarning className="size-5" />}
       />
 
@@ -211,6 +211,7 @@ export default function ComplaintsPage() {
                     </p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       {formatWhen(item.createdAt)}
+                      {item.roomNumber ? ` · Rm ${item.roomNumber}` : ""}
                     </p>
                   </div>
                   <Badge

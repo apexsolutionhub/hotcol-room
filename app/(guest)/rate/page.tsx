@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 import { toast } from "sonner";
 import {
   fetchGuestMyRating,
+  fetchGuestMyRatings,
   guestSubmitRating,
   type GuestRating,
 } from "@/lib/api/guest";
@@ -79,6 +80,7 @@ function formatWhen(iso: string) {
 
 export default function RateStayPage() {
   const [existing, setExisting] = useState<GuestRating | null>(null);
+  const [history, setHistory] = useState<GuestRating[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [overall, setOverall] = useState<number | null>(null);
@@ -99,8 +101,15 @@ export default function RateStayPage() {
     let cancelled = false;
     (async () => {
       try {
-        const data = await fetchGuestMyRating();
-        if (!cancelled) applyRating(data);
+        const [current, all] = await Promise.all([
+          fetchGuestMyRating(),
+          fetchGuestMyRatings(),
+        ]);
+        if (cancelled) return;
+        applyRating(current);
+        setHistory(
+          all.filter((r) => !current || r.id !== current.id),
+        );
       } catch (e) {
         toast.error(notifyError(e, "Could not load rating"));
       } finally {
@@ -207,6 +216,46 @@ export default function RateStayPage() {
           {existing ? "Update rating" : "Submit rating"}
         </Button>
       </form>
+
+      {history.length > 0 ? (
+        <section className="space-y-3">
+          <div>
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              History
+            </p>
+            <h2 className="text-lg font-semibold tracking-tight">
+              Past stay ratings
+            </h2>
+          </div>
+          <ul className="space-y-3">
+            {history.map((item) => (
+              <li
+                key={item.id}
+                className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-medium">
+                    Overall {item.overall}/5
+                    {item.voucherCode ? (
+                      <span className="ml-2 font-mono text-xs text-muted-foreground">
+                        {item.voucherCode}
+                      </span>
+                    ) : null}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatWhen(item.createdAt)}
+                  </p>
+                </div>
+                {item.comment ? (
+                  <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">
+                    {item.comment}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }
